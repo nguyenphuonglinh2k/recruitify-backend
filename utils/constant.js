@@ -5,6 +5,9 @@ module.exports = {
     manager: 3,
     candidate: 4,
   },
+
   DEFAULT_AVATAR_URL:
     "https://res.cloudinary.com/coders-tokyo/image/upload/v1657474500/instello/avatar.png",
+
+  BCRYPT_SALT_ROUNDS: 12,
 };
