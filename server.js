@@ -8,6 +8,8 @@ const cors = require("cors");
 // Import routes
 const authRoute = require("./routes/auth.route");
 const userRoute = require("./routes/user.route");
+const projectRoute = require("./routes/project.route");
+const taskRoute = require("./routes/task.route");
 
 const app = express();
 const port = 5000;
@@ -31,6 +33,8 @@ app.use(bodyParser.json());
 
 app.use("/api/auth", authRoute);
 app.use("/api", userRoute);
+app.use("/api", projectRoute);
+app.use("/api", taskRoute);
 
 app.get("/", (_, res) => {
   res.send("Hello World!");

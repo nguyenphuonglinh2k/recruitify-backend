@@ -6,6 +6,12 @@ module.exports = {
     candidate: 4,
   },
 
+  PROGRESS_STATUS: {
+    new: 1,
+    doing: 2,
+    done: 3,
+  },
+
   DEFAULT_AVATAR_URL:
     "https://res.cloudinary.com/coders-tokyo/image/upload/v1657474500/instello/avatar.png",
 

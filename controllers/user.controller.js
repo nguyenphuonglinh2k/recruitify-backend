@@ -20,7 +20,7 @@ module.exports.getUserInfo = async (req, res) => {
 };
 
 module.exports.putUpdateProfile = async (req, res) => {
-  const { name, avatarUrl, phoneNumber, address } = req.body;
+  const { name, avatarUrl, phoneNumber, address, role } = req.body;
   const userId = req.params.userId;
 
   try {
@@ -31,8 +31,9 @@ module.exports.putUpdateProfile = async (req, res) => {
       {
         name: name || user.name,
         avatarUrl: avatarUrl || user.avatarUrl,
-        phoneNumber: phoneNumber || user.phoneNumber,
-        address: address || user.address,
+        phoneNumber: phoneNumber || user?.phoneNumber,
+        address: address || user?.address,
+        role: role || user.role,
       },
       {},
     ).then((_, err) => {

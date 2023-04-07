@@ -73,7 +73,7 @@ module.exports.postSignUp = (req, res) => {
             return res.status(400).json({ message: "Sign up is failed" });
           }
 
-          return res.json({ message: "Sign up successfully" });
+          return res.status(201).json({ message: "Sign up successfully" });
         });
       });
     })
