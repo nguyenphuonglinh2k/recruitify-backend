@@ -16,6 +16,8 @@ router.post("/project", projectController.postProject);
 
 router.put("/project/:projectId", projectController.putProjectInfo);
 
+router.put("/project/:projectId/members", projectController.putMembers);
+
 router.put(
   "/project/:projectId/tasks",
   projectController.addExistTaskToProject,

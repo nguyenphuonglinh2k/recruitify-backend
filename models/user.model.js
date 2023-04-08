@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { Schema } = mongoose;
 
 const schema = new mongoose.Schema(
   {
@@ -30,10 +31,12 @@ const schema = new mongoose.Schema(
       type: String,
       required: false,
     },
-    applicationIds: {
-      type: Array,
-      required: false,
-    },
+    applicationIds: [
+      {
+        type: Schema.Types.ObjectId,
+        required: false,
+      },
+    ],
   },
   {
     toJSON: { virtuals: true },
@@ -46,6 +49,11 @@ const schema = new mongoose.Schema(
 schema.virtual("id", {
   id: this.id,
 });
+
+// schema.pre("deleteMany", function (next) {
+//   const user = this;
+//   user.model("Task").deleteOne({ assigneeId: user._id }, next);
+// });
 
 const User = mongoose.model("User", schema, "users");
 

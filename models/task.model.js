@@ -30,10 +30,12 @@ const schema = new mongoose.Schema(
     projectId: {
       type: ObjectId,
       required: false,
+      ref: "Project",
     },
     assigneeId: {
       type: ObjectId,
       required: true,
+      ref: "User",
     },
   },
   {

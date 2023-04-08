@@ -14,6 +14,7 @@ const schema = new mongoose.Schema(
     creatorId: {
       type: ObjectId,
       required: true,
+      ref: "User",
     },
     startDate: {
       type: Date,
@@ -31,10 +32,13 @@ const schema = new mongoose.Schema(
       type: Number,
       required: false,
     },
-    memberIds: {
-      type: Array,
-      required: false,
-    },
+    memberIds: [
+      {
+        type: ObjectId,
+        required: false,
+        ref: "User",
+      },
+    ],
   },
   {
     virtuals: true,

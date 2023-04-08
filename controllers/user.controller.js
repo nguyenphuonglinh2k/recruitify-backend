@@ -1,3 +1,5 @@
+const Project = require("../models/project.model");
+const Task = require("../models/task.model");
 const User = require("../models/user.model");
 
 module.exports.getUsers = async (_, res) => {
@@ -42,6 +44,43 @@ module.exports.putUpdateProfile = async (req, res) => {
       } else {
         res.json({ message: "Update successfully" });
       }
+    });
+  } catch (error) {
+    return res.status(400).json(error);
+  }
+};
+
+module.exports.deleteUser = async (req, res) => {
+  const userId = req.params.userId;
+
+  try {
+    // 1. Delete user
+    const deleteUserPromise = await User.findOneAndDelete({ _id: userId });
+
+    // 2. Delete member in project
+    const deleteMemberInProjectPromise = await Project.updateMany(
+      {},
+      { $pull: { memberIds: userId } },
+    );
+
+    // 3. Delete task
+    const deleteTaskPromise = await Task.deleteMany({ assigneeId: userId });
+
+    // 4. Delete project
+    const deleteProjectPromise = await Project.deleteMany({
+      creatorId: userId,
+    });
+
+    Promise.all([
+      deleteUserPromise,
+      deleteMemberInProjectPromise,
+      deleteTaskPromise,
+      deleteProjectPromise,
+    ]).then(result => {
+      if (result) {
+        return res.json({ message: "Delete successfully" });
+      }
+      res.status(400).json({ message: "Delete failed" });
     });
   } catch (error) {
     return res.status(400).json(error);
