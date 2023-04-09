@@ -47,16 +47,10 @@ const schema = new mongoose.Schema(
       type: Date,
       required: false,
     },
-    attachmentIds: {
+    attachments: {
       type: Array,
       required: true,
     },
-    locations: [
-      {
-        type: String,
-        required: false,
-      },
-    ],
     skillIds: [
       {
         type: ObjectId,
