@@ -7,10 +7,6 @@ const schema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    description: {
-      type: String,
-      required: false,
-    },
     status: {
       type: Number,
       required: true,
@@ -38,10 +34,18 @@ const schema = new mongoose.Schema(
         required: false,
       },
     ],
+    assigneeIds: [
+      {
+        type: ObjectId,
+        required: false,
+        ref: "User",
+      },
+    ],
     tagIds: [
       {
         type: ObjectId,
         required: false,
+        ref: "Tag",
       },
     ],
     isPriority: {
