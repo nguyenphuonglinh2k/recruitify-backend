@@ -10,6 +10,8 @@ const authRoute = require("./routes/auth.route");
 const userRoute = require("./routes/user.route");
 const projectRoute = require("./routes/project.route");
 const taskRoute = require("./routes/task.route");
+const tagRoute = require("./routes/tag.route");
+// const jobRoute = require("./routes/job.route");
 
 const app = express();
 const port = 5000;
@@ -35,6 +37,7 @@ app.use("/api/auth", authRoute);
 app.use("/api", userRoute);
 app.use("/api", projectRoute);
 app.use("/api", taskRoute);
+app.use("/api", tagRoute);
 
 app.get("/", (_, res) => {
   res.send("Hello World!");
