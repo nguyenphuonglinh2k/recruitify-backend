@@ -199,7 +199,7 @@ module.exports.addExistTaskToProject = async (req, res) => {
   try {
     await Task.updateMany(
       { _id: { $in: taskIds } },
-      { $set: { projectId } },
+      { $set: { projectId }, $inc: { taskTotal: taskIds.length ?? 0 } },
     ).then((result, error) => {
       if (!result) {
         res.status(400).json({

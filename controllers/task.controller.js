@@ -4,9 +4,19 @@ const constant = require("../utils/constant");
 
 module.exports.getProjectTasks = async (req, res) => {
   const projectId = req.params.projectId;
+  const { status, memberId } = req.query;
+
+  const queryOptions = { projectId };
+
+  if (status) {
+    queryOptions.status = status;
+  }
+  if (memberId) {
+    queryOptions.memberId = memberId;
+  }
 
   try {
-    await Task.find({ projectId })
+    await Task.find(queryOptions)
       .then((results, error) => {
         if (results) {
           return res.json(results);
@@ -146,13 +156,14 @@ module.exports.putTask = async (req, res) => {
         description,
         projectId,
       },
+      { new: true },
     )
       .then(result => {
         if (!result) {
           return res.status(400).json({ message: "Update user failed" });
         }
 
-        res.json({ message: "Update task successfully" });
+        res.json({ message: "Update task successfully", data: result });
       })
       .catch(error => res.status(400).json(error));
   } catch (error) {

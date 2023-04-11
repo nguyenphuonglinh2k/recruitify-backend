@@ -13,6 +13,7 @@ const schema = new mongoose.Schema(
     progress: {
       type: Number,
       required: true,
+      default: 0,
     },
     status: {
       type: Number,

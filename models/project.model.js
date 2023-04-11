@@ -31,6 +31,7 @@ const schema = new mongoose.Schema(
     taskTotal: {
       type: Number,
       required: false,
+      default: 0,
     },
     memberIds: [
       {
