@@ -3,10 +3,15 @@ const User = require("../models/user.model");
 const Constant = require("../utils/constant");
 
 module.exports.getJobs = async (req, res) => {
-  const status = req.body?.status ?? Constant.JOB_AND_APPLICATION_STATUS.active;
+  const status =
+    req.query?.status ?? Constant.JOB_AND_APPLICATION_STATUS.active;
 
   try {
-    const jobs = await Job.find({ status });
+    const jobs = await Job.find({ status }).populate([
+      { path: "creatorId", select: "-password" },
+      { path: "assigneeIds", select: "-password" },
+      { path: "tagIds" },
+    ]);
     res.json(jobs);
   } catch (error) {
     res.status(400).json(error);
@@ -17,7 +22,11 @@ module.exports.getJobDetail = async (req, res) => {
   const jobId = req.params.jobId;
 
   try {
-    const job = await Job.findById(jobId);
+    const job = await Job.findById(jobId).populate([
+      { path: "creatorId", select: "-password" },
+      { path: "assigneeIds", select: "-password" },
+      { path: "tagIds" },
+    ]);
     res.json(job);
   } catch (error) {
     res.status(400).json(error);
@@ -57,6 +66,7 @@ module.exports.postJob = async (req, res) => {
       tagIds: tagIds ?? [],
       isPriority: isPriority ?? false,
       assigneeIds: assigneeIds ?? [],
+      applicationTotal: 0,
     };
 
     await Job.create(newProject).then((result, err) => {
@@ -77,7 +87,6 @@ module.exports.putJob = async (req, res) => {
   const jobId = req.params.jobId;
   const {
     name,
-    creatorId,
     startDate,
     endDate,
     locations,
@@ -92,7 +101,6 @@ module.exports.putJob = async (req, res) => {
       { _id: jobId },
       {
         name,
-        creatorId,
         startDate,
         endDate,
         locations,

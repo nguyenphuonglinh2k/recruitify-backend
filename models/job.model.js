@@ -48,9 +48,15 @@ const schema = new mongoose.Schema(
         ref: "Tag",
       },
     ],
+    applicationTotal: {
+      type: Number,
+      required: false,
+      default: 0,
+    },
     isPriority: {
       type: Boolean,
       required: false,
+      default: false,
     },
   },
   {
