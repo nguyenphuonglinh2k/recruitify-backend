@@ -37,12 +37,12 @@ module.exports.putUpdateProfile = async (req, res) => {
         address: address || user?.address,
         role: role || user.role,
       },
-      {},
-    ).then((_, err) => {
+      { new: true },
+    ).then((result, err) => {
       if (err) {
         res.status(400).json(err);
       } else {
-        res.json({ message: "Update successfully" });
+        res.json({ message: "Update successfully", data: result });
       }
     });
   } catch (error) {

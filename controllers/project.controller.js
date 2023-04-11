@@ -39,7 +39,12 @@ module.exports.getProjectInfo = async (req, res) => {
   const { projectId } = req.params;
 
   try {
-    const project = await Project.findById(projectId).lean();
+    const project = await Project.findById(projectId)
+      .populate([
+        { path: "creatorId", select: "-password" },
+        { path: "memberIds", select: "-password" },
+      ])
+      .lean();
 
     res.json(project);
   } catch (error) {
@@ -170,13 +175,16 @@ module.exports.putProjectInfo = async (req, res) => {
         status,
         memberIds,
       },
+      {
+        new: true,
+      },
     )
       .then(result => {
         if (!result) {
           return res.status(400).json({ message: "Project not found" });
         }
 
-        res.json({ message: "Update project successfully" });
+        res.json({ message: "Update project successfully", data: result });
       })
       .catch(err => res.status(400).json(err));
   } catch (error) {
