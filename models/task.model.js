@@ -1,4 +1,3 @@
-const { ObjectId } = require("mongodb");
 const mongoose = require("mongoose");
 
 const schema = new mongoose.Schema(
@@ -28,12 +27,12 @@ const schema = new mongoose.Schema(
       required: false,
     },
     projectId: {
-      type: ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       required: false,
       ref: "Project",
     },
     assigneeId: {
-      type: ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: "User",
     },

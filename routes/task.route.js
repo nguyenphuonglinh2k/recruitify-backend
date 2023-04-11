@@ -7,6 +7,8 @@ router.get("/project/:projectId/tasks", taskController.getProjectTasks);
 
 router.get("/member/:memberId/tasks", taskController.getTasksOfMember);
 
+router.get("/task/:tasksId/:memberId", taskController.getTaskDetailOfMember);
+
 router.get(
   "/project/:projectId/member-tasks",
   taskController.getTasksOfAllMemberOfProject,

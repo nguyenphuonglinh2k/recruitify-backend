@@ -1,5 +1,6 @@
 const Project = require("../models/project.model");
 const Task = require("../models/task.model");
+const constant = require("../utils/constant");
 
 module.exports.getProjectTasks = async (req, res) => {
   const projectId = req.params.projectId;
@@ -21,12 +22,34 @@ module.exports.getProjectTasks = async (req, res) => {
 
 module.exports.getTasksOfMember = async (req, res) => {
   const memberId = req.params.memberId;
+  const status = req.query?.status ?? constant.PROGRESS_STATUS.new;
 
   try {
-    await Task.find({ assigneeId: memberId })
+    await Task.find({ assigneeId: memberId, status })
+      .populate("projectId")
       .then((results, error) => {
         if (results) {
           return res.json(results);
+        } else {
+          return res.status(400).json(error);
+        }
+      })
+      .catch(error => res.status(400).json(error));
+  } catch (error) {
+    return res.status(400).json(error);
+  }
+};
+
+module.exports.getTaskDetailOfMember = async (req, res) => {
+  const { memberId, taskId } = req.params;
+  const status = req.query?.status ?? constant.PROGRESS_STATUS.new;
+
+  try {
+    await Task.find({ assigneeId: memberId, _id: taskId, status })
+      .populate("projectId")
+      .then((result, error) => {
+        if (result) {
+          return res.json(result);
         } else {
           return res.status(400).json(error);
         }
