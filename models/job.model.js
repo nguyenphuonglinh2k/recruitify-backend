@@ -17,11 +17,11 @@ const schema = new mongoose.Schema(
       ref: "User",
     },
     startDate: {
-      type: Date,
+      type: String,
       required: false,
     },
     endDate: {
-      type: Date,
+      type: String,
       required: false,
     },
     documentIds: {

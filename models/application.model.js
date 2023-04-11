@@ -40,11 +40,11 @@ const schema = new mongoose.Schema(
       ref: "Job",
     },
     startDate: {
-      type: Date,
+      type: String,
       required: false,
     },
     endDate: {
-      type: Date,
+      type: String,
       required: false,
     },
     attachments: {

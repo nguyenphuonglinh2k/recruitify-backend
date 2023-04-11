@@ -26,7 +26,10 @@ module.exports.getTasksOfMember = async (req, res) => {
 
   try {
     await Task.find({ assigneeId: memberId, status })
-      .populate("projectId")
+      .populate([
+        { path: "projectId" },
+        { path: "assigneeId", select: "-password" },
+      ])
       .then((results, error) => {
         if (results) {
           return res.json(results);
