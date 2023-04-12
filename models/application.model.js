@@ -39,17 +39,10 @@ const schema = new mongoose.Schema(
       required: true,
       ref: "Job",
     },
-    startDate: {
-      type: String,
-      required: false,
-    },
-    endDate: {
-      type: String,
-      required: false,
-    },
     attachments: {
       type: Array,
       required: true,
+      default: [],
     },
     skillIds: [
       {
@@ -61,6 +54,7 @@ const schema = new mongoose.Schema(
     isPriority: {
       type: Boolean,
       required: false,
+      default: false,
     },
   },
   {

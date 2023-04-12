@@ -17,6 +17,7 @@ module.exports.getProjectTasks = async (req, res) => {
 
   try {
     await Task.find(queryOptions)
+      .populate("assigneeId")
       .then((results, error) => {
         if (results) {
           return res.json(results);

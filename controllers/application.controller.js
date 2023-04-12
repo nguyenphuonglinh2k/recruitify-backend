@@ -3,10 +3,13 @@ const Constant = require("../utils/constant");
 
 module.exports.getApplications = async (req, res) => {
   const status =
-    req.body?.status ?? Constant.APPLICATION_PROCESS_STATUS.screening;
+    req.query?.status ?? Constant.APPLICATION_PROCESS_STATUS.screening;
 
   try {
-    const applications = await Application.find({ status });
+    const applications = await Application.find({ status }).populate([
+      { path: "skillIds" },
+      { path: "jobId" },
+    ]);
     res.json(applications);
   } catch (error) {
     res.status(400).json(error);
@@ -17,7 +20,10 @@ module.exports.getApplicationDetail = async (req, res) => {
   const applicationId = req.params.applicationId;
 
   try {
-    const application = await Application.findById(applicationId);
+    const application = await Application.findById(applicationId).populate([
+      { path: "skillIds" },
+      { path: "jobId" },
+    ]);
     res.json(application);
   } catch (error) {
     res.status(400).json(error);
@@ -25,18 +31,10 @@ module.exports.getApplicationDetail = async (req, res) => {
 };
 
 module.exports.postApplication = async (req, res) => {
-  const {
-    startDate,
-    endDate,
-    applicantInfo,
-    jobId,
-    status,
-    attachments,
-    skillIds,
-    isPriority,
-  } = req.body;
+  const { applicantInfo, jobId, status, attachments, skillIds, isPriority } =
+    req.body;
 
-  if (!applicantInfo?.name || !applicantInfo?.email || attachments || jobId) {
+  if (!applicantInfo?.name || !applicantInfo?.email || !attachments || !jobId) {
     return res
       .status(400)
       .json({ message: "applicantInfo, jobId and attachments is required" });
@@ -53,8 +51,6 @@ module.exports.postApplication = async (req, res) => {
       },
       jobId,
       attachments,
-      startDate: startDate ?? null,
-      endDate: endDate ?? null,
       status: status ?? Constant.APPLICATION_PROCESS_STATUS.screening,
       skillIds: skillIds ?? [],
       isPriority: isPriority ?? false,
@@ -74,16 +70,8 @@ module.exports.postApplication = async (req, res) => {
 
 module.exports.putApplication = async (req, res) => {
   const applicationId = req.params.applicationId;
-  const {
-    startDate,
-    endDate,
-    applicantInfo,
-    jobId,
-    status,
-    skillIds,
-    isPriority,
-    attachments,
-  } = req.body;
+  const { applicantInfo, jobId, status, skillIds, isPriority, attachments } =
+    req.body;
 
   try {
     await Application.findByIdAndUpdate(
@@ -100,8 +88,6 @@ module.exports.putApplication = async (req, res) => {
         status,
         skillIds,
         isPriority,
-        startDate,
-        endDate,
         attachments,
       },
       { new: true },
