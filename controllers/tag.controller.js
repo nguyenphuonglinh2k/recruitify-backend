@@ -13,11 +13,7 @@ module.exports.postTags = async (req, res) => {
   const { tags } = req.body; // format: {name: ""}
 
   try {
-    const newTagArray = tags;
-
-    console.log(newTagArray);
-
-    await Tag.create(newTagArray).then((_, err) => {
+    await Tag.create(tags).then((_, err) => {
       if (err) {
         return res
           .status(400)
