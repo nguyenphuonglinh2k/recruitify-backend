@@ -14,6 +14,7 @@ const taskRoute = require("./routes/task.route");
 const tagRoute = require("./routes/tag.route");
 const jobRoute = require("./routes/job.route");
 const applicationRoute = require("./routes/application.route");
+const scheduleRoute = require("./routes/schedule.route");
 
 const app = express();
 const port = 5000;
@@ -42,6 +43,7 @@ app.use("/api", taskRoute);
 app.use("/api", tagRoute);
 app.use("/api", jobRoute);
 app.use("/api", applicationRoute);
+app.use("/api", scheduleRoute);
 
 app.get("/", (_, res) => {
   res.send("Hello World!");
