@@ -11,7 +11,7 @@ router.get("/task/:tasksId/:memberId", taskController.getTaskDetailOfMember);
 
 router.get(
   "/project/:projectId/member-tasks",
-  taskController.getTasksOfAllMemberOfProject,
+  taskController.getTasksOfAllMemberNotInProject,
 );
 
 router.post("/task", taskController.postTask);

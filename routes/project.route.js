@@ -25,4 +25,9 @@ router.put(
 
 router.delete("/project/:projectId", projectController.deleteProject);
 
+router.delete(
+  "/project/tasks/:taskId",
+  projectController.deleteExistTaskOutOfProject,
+);
+
 module.exports = router;

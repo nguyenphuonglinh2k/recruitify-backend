@@ -74,7 +74,7 @@ module.exports.getTaskDetailOfMember = async (req, res) => {
   }
 };
 
-module.exports.getTasksOfAllMemberOfProject = async (req, res) => {
+module.exports.getTasksOfAllMemberNotInProject = async (req, res) => {
   const projectId = req.params.projectId;
 
   try {
@@ -84,15 +84,16 @@ module.exports.getTasksOfAllMemberOfProject = async (req, res) => {
       return res.status(400).json({ message: "Project not found" });
     }
 
-    await Task.find({ assigneeId: { $in: project?.memberIds ?? [] } }).then(
-      (result, error) => {
-        if (error) {
-          return res.status(400).json({ message: "Request failed", error });
-        }
+    await Task.find({
+      assigneeId: { $in: project?.memberIds ?? [] },
+      projectId: null,
+    }).then((result, error) => {
+      if (error) {
+        return res.status(400).json({ message: "Request failed", error });
+      }
 
-        res.json(result);
-      },
-    );
+      res.json(result);
+    });
   } catch (error) {
     return res.status(400).json(error);
   }

@@ -217,6 +217,32 @@ module.exports.addExistTaskToProject = async (req, res) => {
   }
 };
 
+module.exports.deleteExistTaskOutOfProject = async (req, res) => {
+  const taskId = req.params.taskId;
+
+  try {
+    await Task.findByIdAndUpdate(
+      { _id: taskId },
+      { projectId: null },
+      { new: true },
+    ).then((result, error) => {
+      if (!result) {
+        res.status(400).json({
+          message: "Update project's tasks failed",
+          error,
+        });
+      } else {
+        res.json({
+          message: "Update project's tasks successfully",
+          data: result,
+        });
+      }
+    });
+  } catch (error) {
+    return res.status(400).json(error);
+  }
+};
+
 module.exports.deleteProject = async (req, res) => {
   const projectId = req.params.projectId;
 
