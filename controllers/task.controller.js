@@ -87,13 +87,18 @@ module.exports.getTasksOfAllMemberNotInProject = async (req, res) => {
     await Task.find({
       assigneeId: { $in: project?.memberIds ?? [] },
       projectId: null,
-    }).then((result, error) => {
-      if (error) {
-        return res.status(400).json({ message: "Request failed", error });
-      }
+    })
+      .populate([
+        { path: "projectId" },
+        { path: "assigneeId", select: "-password" },
+      ])
+      .then((result, error) => {
+        if (error) {
+          return res.status(400).json({ message: "Request failed", error });
+        }
 
-      res.json(result);
-    });
+        res.json(result);
+      });
   } catch (error) {
     return res.status(400).json(error);
   }

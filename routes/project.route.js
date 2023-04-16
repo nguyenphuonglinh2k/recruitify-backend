@@ -26,7 +26,7 @@ router.put(
 router.delete("/project/:projectId", projectController.deleteProject);
 
 router.delete(
-  "/project/tasks/:taskId",
+  "/project/:projectId/task/:taskId",
   projectController.deleteExistTaskOutOfProject,
 );
 

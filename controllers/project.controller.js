@@ -197,47 +197,49 @@ module.exports.addExistTaskToProject = async (req, res) => {
   const { taskIds } = req.body;
 
   try {
-    await Task.updateMany(
+    const updateProjectPromise = Project.findByIdAndUpdate(
+      { _id: projectId },
+      { $inc: { taskTotal: taskIds.length ?? 0 } },
+    );
+
+    const updateTaskPromise = Task.updateMany(
       { _id: { $in: taskIds } },
-      { $set: { projectId }, $inc: { taskTotal: taskIds.length ?? 0 } },
-    ).then((result, error) => {
-      if (!result) {
-        res.status(400).json({
-          message: "Update Task failed",
-          error,
-        });
-      } else {
-        res.json({
-          message: "Update successfully",
-        });
-      }
-    });
+      { $set: { projectId } },
+    );
+
+    Promise.all([updateProjectPromise, updateTaskPromise])
+      .then(() => {
+        return res.json({ message: "Update task successfully" });
+      })
+      .catch(err => {
+        return res.status(400).json(err);
+      });
   } catch (error) {
     return res.status(400).json(error);
   }
 };
 
 module.exports.deleteExistTaskOutOfProject = async (req, res) => {
-  const taskId = req.params.taskId;
+  const { taskId, projectId } = req.params;
 
   try {
-    await Task.findByIdAndUpdate(
+    const updateProjectPromise = Project.findByIdAndUpdate(
+      { _id: projectId },
+      { $inc: { taskTotal: -1 } },
+    );
+
+    const updateTaskPromise = Task.findByIdAndUpdate(
       { _id: taskId },
       { projectId: null },
-      { new: true },
-    ).then((result, error) => {
-      if (!result) {
-        res.status(400).json({
-          message: "Update project's tasks failed",
-          error,
-        });
-      } else {
-        res.json({
-          message: "Update project's tasks successfully",
-          data: result,
-        });
-      }
-    });
+    );
+
+    Promise.all([updateProjectPromise, updateTaskPromise])
+      .then(() => {
+        return res.json({ message: "Update successfully" });
+      })
+      .catch(err => {
+        return res.status(400).json(err);
+      });
   } catch (error) {
     return res.status(400).json(error);
   }
