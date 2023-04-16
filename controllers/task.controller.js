@@ -17,7 +17,10 @@ module.exports.getProjectTasks = async (req, res) => {
 
   try {
     await Task.find(queryOptions)
-      .populate("assigneeId")
+      .populate([
+        { path: "assigneeId", select: "-password" },
+        { path: "projectId" },
+      ])
       .then((results, error) => {
         if (results) {
           return res.json(results);
