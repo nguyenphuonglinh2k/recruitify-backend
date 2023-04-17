@@ -59,10 +59,9 @@ module.exports.getTasksOfMember = async (req, res) => {
 
 module.exports.getTaskDetailOfMember = async (req, res) => {
   const { memberId, taskId } = req.params;
-  const status = req.query?.status ?? constant.PROGRESS_STATUS.new;
 
   try {
-    await Task.find({ assigneeId: memberId, _id: taskId, status })
+    await Task.findOne({ assigneeId: memberId, _id: taskId })
       .populate([
         { path: "assigneeId", select: "-password" },
         { path: "projectId" },
