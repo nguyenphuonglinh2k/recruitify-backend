@@ -12,10 +12,7 @@ module.exports.getProjects = async (req, res) => {
   try {
     const user = await User.findById(userId).lean();
 
-    if (
-      user.role === Constant.USER_ROLE.admin ||
-      user.role === Constant.USER_ROLE.manager
-    ) {
+    if (user.role === Constant.USER_ROLE.admin) {
       const projects = await Project.find({ status });
       res.json(projects);
     } else {

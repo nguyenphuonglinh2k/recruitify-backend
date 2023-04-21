@@ -1,4 +1,5 @@
 const Application = require("../models/application.model");
+const Job = require("../models/job.model");
 const Constant = require("../utils/constant");
 
 module.exports.getApplications = async (req, res) => {
@@ -56,13 +57,20 @@ module.exports.postApplication = async (req, res) => {
       isPriority: isPriority ?? false,
     };
 
-    await Application.create(newApplication).then((result, err) => {
-      if (err) {
-        return res.status(400).json({ message: "Create  failed" });
-      }
+    const updateJobPromise = Job.findByIdAndUpdate(
+      { _id: jobId },
+      { $inc: { applicationTotal: 1 } },
+    );
 
-      res.status(201).json({ message: "Create  successfully", data: result });
-    });
+    const applicationPromise = Application.create(newApplication);
+
+    Promise.all([updateJobPromise, applicationPromise])
+      .then(response => {
+        return res.json({ message: "Create successfully", data: response[1] });
+      })
+      .catch(err => {
+        return res.status(400).json(err);
+      });
   } catch (error) {
     return res.status(400).json(error);
   }
@@ -73,31 +81,57 @@ module.exports.putApplication = async (req, res) => {
   const { applicantInfo, jobId, status, skillIds, isPriority, attachments } =
     req.body;
 
-  try {
-    await Application.findByIdAndUpdate(
-      { _id: applicationId },
-      {
-        applicantInfo: {
-          name: applicantInfo?.name,
-          email: applicantInfo?.email,
-          phoneNumber: applicantInfo?.phoneNumber,
-          address: applicantInfo?.address,
-          avatarUrl: applicantInfo?.avatarUrl,
-        },
-        jobId,
-        status,
-        skillIds,
-        isPriority,
-        attachments,
-      },
-      { new: true },
-    )
-      .then(result => {
-        if (!result) return res.status(400).json({ message: "Update failed" });
+  const newInfo = { jobId, status, skillIds, isPriority, attachments };
 
-        res.json({ message: "Update successfully", data: result });
+  try {
+    const prevApplication = await Application.findById(applicationId);
+    const promises = [];
+
+    if (jobId) {
+      const isDifferentJobId = prevApplication.jobId.valueOf() !== jobId;
+
+      if (isDifferentJobId) {
+        const updateNewJobPromise = Job.findByIdAndUpdate(
+          { _id: jobId },
+          { $inc: { applicationTotal: 1 } },
+        );
+        const updatePrevJobPromise = Job.findByIdAndUpdate(
+          { _id: prevApplication.jobId },
+          { $inc: { applicationTotal: -1 } },
+        );
+
+        promises.push([updateNewJobPromise, updatePrevJobPromise]);
+      }
+    }
+
+    const prevApplicantInfo = prevApplication.applicantInfo;
+
+    if (applicantInfo) {
+      newInfo.applicantInfo = {
+        name: applicantInfo?.name ?? prevApplicantInfo.name,
+        email: applicantInfo?.email ?? prevApplicantInfo.email,
+        phoneNumber:
+          applicantInfo?.phoneNumber ?? prevApplicantInfo.phoneNumber,
+        address: applicantInfo?.address ?? prevApplicantInfo.address,
+        avatarUrl: applicantInfo?.avatarUrl ?? prevApplicantInfo.avatarUrl,
+      };
+    }
+
+    const updateApplicationPromise = Application.findByIdAndUpdate(
+      { _id: applicationId },
+      newInfo,
+      {
+        new: true,
+      },
+    );
+
+    Promise.all([updateApplicationPromise, ...promises])
+      .then(response => {
+        return res.json({ message: "Update successfully", data: response[0] });
       })
-      .catch(error => res.status(400).json(error));
+      .catch(err => {
+        return res.status(400).json(err);
+      });
   } catch (error) {
     return res.status(400).json(error);
   }
