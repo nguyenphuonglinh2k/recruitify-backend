@@ -1,5 +1,6 @@
 const Job = require("../models/job.model");
 const User = require("../models/user.model");
+const Application = require("../models/application.model");
 const Constant = require("../utils/constant");
 
 module.exports.getJobs = async (req, res) => {
@@ -28,6 +29,18 @@ module.exports.getJobDetail = async (req, res) => {
       { path: "tagIds" },
     ]);
     res.json(job);
+  } catch (error) {
+    res.status(400).json(error);
+  }
+};
+
+module.exports.getApplicationsOfJob = async (req, res) => {
+  const jobId = req.params.jobId;
+
+  try {
+    const applications = await Application.find({ jobId });
+
+    res.json(applications);
   } catch (error) {
     res.status(400).json(error);
   }
