@@ -11,10 +11,17 @@ const schema = new mongoose.Schema(
       required: false,
       default: "",
     },
-    dateTime: {
-      type: Date,
+    startTime: {
+      type: String,
       required: true,
-      default: Date.now,
+    },
+    endTime: {
+      type: String,
+      required: true,
+    },
+    date: {
+      type: String,
+      required: true,
     },
     assigneeIds: [
       {

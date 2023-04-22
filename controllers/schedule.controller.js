@@ -9,7 +9,7 @@ module.exports.getSchedules = async (req, res) => {
     const filterOptions = {};
 
     if (date) {
-      filterOptions.dateTime = date;
+      filterOptions.date = date;
     }
     if (memberId) {
       filterOptions.assigneeIds = { $all: [memberId] };
@@ -47,7 +47,9 @@ module.exports.postSchedules = async (req, res) => {
   const {
     description,
     name,
-    dateTime,
+    date,
+    startTime,
+    endTime,
     creatorId,
     applicationId,
     jobId,
@@ -55,14 +57,23 @@ module.exports.postSchedules = async (req, res) => {
   } = req.body;
 
   try {
-    if (!name || !dateTime || !creatorId || !assigneeIds) {
+    if (
+      !name ||
+      !date ||
+      !endTime ||
+      !startTime ||
+      !creatorId ||
+      !assigneeIds
+    ) {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
     const newSchedule = {
       name,
       description,
-      dateTime: new Date(dateTime),
+      date,
+      startTime,
+      endTime,
       creatorId,
       applicationId,
       jobId,
@@ -86,9 +97,21 @@ module.exports.postSchedules = async (req, res) => {
 };
 
 module.exports.putSchedule = async (req, res) => {
-  const { description, name, dateTime, jobId, assigneeIds, applicationId } =
-    req.body;
+  const {
+    description,
+    name,
+    date,
+    startTime,
+    endTime,
+    jobId,
+    assigneeIds,
+    applicationId,
+  } = req.body;
   const { scheduleId } = req.params;
+
+  if (!name || !date || !endTime || !startTime || !assigneeIds) {
+    return res.status(400).json({ message: "Missing required fields" });
+  }
 
   try {
     await Schedule.findByIdAndUpdate(
@@ -96,7 +119,9 @@ module.exports.putSchedule = async (req, res) => {
       {
         description,
         name,
-        dateTime,
+        date,
+        startTime,
+        endTime,
         jobId,
         assigneeIds,
         applicationId,
