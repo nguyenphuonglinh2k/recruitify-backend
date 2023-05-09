@@ -28,7 +28,7 @@ module.exports.putUpdateProfile = async (req, res) => {
   try {
     const user = await User.findById({ _id: userId }).lean();
 
-    await User.updateOne(
+    await User.findByIdAndUpdate(
       { _id: userId },
       {
         name: name || user.name,
@@ -38,13 +38,15 @@ module.exports.putUpdateProfile = async (req, res) => {
         role: role || user.role,
       },
       { new: true },
-    ).then((result, err) => {
-      if (err) {
-        res.status(400).json(err);
-      } else {
-        res.json({ message: "Update successfully", data: result });
-      }
-    });
+    )
+      .select("-password")
+      .then((result, err) => {
+        if (err) {
+          res.status(400).json(err);
+        } else {
+          res.json({ message: "Update successfully", data: result });
+        }
+      });
   } catch (error) {
     return res.status(400).json(error);
   }
