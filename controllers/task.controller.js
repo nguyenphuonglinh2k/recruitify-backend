@@ -12,7 +12,7 @@ module.exports.getProjectTasks = async (req, res) => {
     queryOptions.status = status;
   }
   if (memberId) {
-    queryOptions.memberId = memberId;
+    queryOptions.assigneeId = memberId;
   }
 
   try {
