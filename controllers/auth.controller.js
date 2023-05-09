@@ -113,9 +113,10 @@ module.exports.putUpdatePassword = async (req, res) => {
           User.findByIdAndUpdate({ _id: userId }, { password: hash })
             .then(result => {
               if (!result) {
-                return res.json({ message: "Update password is failed" });
+                return res
+                  .status(400)
+                  .json({ message: "Update password is failed" });
               }
-
               res.json({ message: "Update password successfully" });
             })
             .catch(err => console.log(err));
