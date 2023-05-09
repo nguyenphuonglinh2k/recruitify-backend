@@ -125,6 +125,8 @@ module.exports.postTask = async (req, res) => {
     return res.status(400).json({ message: "Miss required fields" });
   }
 
+  const promises = [];
+
   try {
     const newTask = new Task({
       name,
@@ -137,15 +139,27 @@ module.exports.postTask = async (req, res) => {
       projectId: projectId ?? null,
     });
 
-    await Task.create(newTask).then((result, error) => {
-      if (error) {
-        return res.status(400).json({ message: "Create task failed", error });
-      }
+    const createTaskPromise = Task.create(newTask);
+    promises.push(createTaskPromise);
 
-      return res
-        .status(201)
-        .json({ message: "Create task successfully", data: result });
-    });
+    if (projectId) {
+      const updateProjectPromise = Project.findByIdAndUpdate(
+        { _id: projectId },
+        { $inc: { taskTotal: 1 } },
+      );
+      promises.push(updateProjectPromise);
+    }
+
+    Promise.all(promises)
+      .then(responses => {
+        return res.status(201).json({
+          message: "Create task successfully",
+          data: responses[0],
+        });
+      })
+      .catch(err => {
+        return res.status(400).json(err);
+      });
   } catch (error) {
     return res.status(400).json(error);
   }
@@ -157,7 +171,11 @@ module.exports.putTask = async (req, res) => {
   const taskId = req.params.taskId;
 
   try {
-    Task.findByIdAndUpdate(
+    const task = await Task.findById(taskId).lean();
+    const prevProjectId = task.projectId;
+    const promises = [];
+
+    const updateTaskPromise = Task.findByIdAndUpdate(
       { _id: taskId },
       {
         name,
@@ -169,15 +187,45 @@ module.exports.putTask = async (req, res) => {
         projectId,
       },
       { new: true },
-    )
-      .then(result => {
-        if (!result) {
-          return res.status(400).json({ message: "Update user failed" });
-        }
+    );
+    promises.push(updateTaskPromise);
 
-        res.json({ message: "Update task successfully", data: result });
+    if (projectId && prevProjectId && prevProjectId !== projectId) {
+      const updatePrevProjectPromise = Project.findByIdAndUpdate(
+        { _id: prevProjectId },
+        { $inc: { taskTotal: -1 } },
+      );
+
+      const updateNextProjectPromise = Project.findByIdAndUpdate(
+        { _id: projectId },
+        { $inc: { taskTotal: 1 } },
+      );
+
+      promises.push(updatePrevProjectPromise, updateNextProjectPromise);
+      // !prevProjectId && !projectId -> skip
+      // !prevProjectId && projectId -> update projectId
+      // prevProjectId && projectId -> update both
+    } else if (!prevProjectId && projectId) {
+      const updateNextProjectPromise = Project.findByIdAndUpdate(
+        { _id: projectId },
+        { $inc: { taskTotal: 1 } },
+      );
+
+      promises.push(updateNextProjectPromise);
+    }
+
+    Promise.all(promises)
+      .then(responses => {
+        return res.json({
+          message: "Update task successfully",
+          data: responses[0],
+        });
       })
-      .catch(error => res.status(400).json(error));
+      .catch(err => {
+        return res
+          .status(400)
+          .json({ message: "Update task failed", error: err });
+      });
   } catch (error) {
     res.status(400).json(error);
   }
@@ -187,17 +235,32 @@ module.exports.deleteTask = async (req, res) => {
   const taskId = req.params.taskId;
 
   try {
-    await Task.findOneAndDelete({ _id: taskId }).then(result => {
-      if (!result) {
-        res.status(400).json({
-          message: "Delete task failed",
-        });
-      } else {
-        res.json({
+    const task = await Task.findById(taskId).lean();
+    const projectId = task.projectId;
+    const promises = [];
+
+    const deleteTaskPromise = Task.findOneAndDelete({ _id: taskId });
+    promises.push(deleteTaskPromise);
+
+    if (projectId) {
+      const updateProjectPromise = Project.findByIdAndUpdate(
+        { _id: projectId },
+        { $inc: { taskTotal: -1 } },
+      );
+      promises.push(updateProjectPromise);
+    }
+
+    Promise.all(promises)
+      .then(() => {
+        return res.json({
           message: "Delete task successfully",
         });
-      }
-    });
+      })
+      .catch(err => {
+        return res
+          .status(400)
+          .json({ message: "Delete task failed", error: err });
+      });
   } catch (error) {
     return res.status(400).json(error);
   }
