@@ -2,9 +2,20 @@ const Project = require("../models/project.model");
 const Task = require("../models/task.model");
 const User = require("../models/user.model");
 
-module.exports.getUsers = async (_, res) => {
-  const users = await User.find().select("-password");
-  res.json(users);
+module.exports.getUsers = async (req, res) => {
+  const { roles } = req.query;
+  const options = {};
+
+  if (roles) {
+    options.role = { $in: roles };
+  }
+
+  try {
+    const users = await User.find(options).select("-password");
+    res.json(users);
+  } catch (error) {
+    return res.status(400).json(error);
+  }
 };
 
 module.exports.getUserInfo = async (req, res) => {
