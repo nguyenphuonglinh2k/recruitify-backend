@@ -10,7 +10,7 @@ module.exports.getTags = async (_, res) => {
 };
 
 module.exports.postTags = async (req, res) => {
-  const { tags } = req.body; // format: {name: ""}
+  const { tags } = req.body; // format: tags = [{name: ""}]
 
   try {
     await Tag.create(tags).then((_, err) => {
@@ -28,10 +28,11 @@ module.exports.postTags = async (req, res) => {
 };
 
 module.exports.putTags = async (req, res) => {
-  const { tagIds } = req.body;
+  const { name } = req.body;
+  const tagId = req.params.tagId;
 
   try {
-    await Tag.deleteMany({ _id: { $nin: tagIds || [] } }).then(
+    await Tag.findByIdAndUpdate({ _id: tagId }, { name }, { new: true }).then(
       (result, error) => {
         if (error) {
           res.status(400).json({ message: "Update tags failed", error });
@@ -40,6 +41,22 @@ module.exports.putTags = async (req, res) => {
         res.json({ message: "Update tags successfully", data: result });
       },
     );
+  } catch (error) {
+    res.status(400).json(error);
+  }
+};
+
+module.exports.deleteTag = async (req, res) => {
+  const tagId = req.params.tagId;
+
+  try {
+    await Tag.findByIdAndDelete(tagId).then((_, error) => {
+      if (error) {
+        res.status(400).json({ message: "Delete failed", error });
+      }
+
+      res.json({ message: "Delete successfully" });
+    });
   } catch (error) {
     res.status(400).json(error);
   }

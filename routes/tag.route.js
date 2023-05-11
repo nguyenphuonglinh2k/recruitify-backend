@@ -7,6 +7,8 @@ router.get("/tags", tagController.getTags);
 
 router.post("/tags", tagController.postTags);
 
-router.put("/tags", tagController.putTags);
+router.put("/tag/:tagId", tagController.putTags);
+
+router.delete("/tag/:tagId", tagController.deleteTag);
 
 module.exports = router;

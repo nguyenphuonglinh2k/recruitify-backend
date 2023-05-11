@@ -66,7 +66,9 @@ module.exports.postApplication = async (req, res) => {
 
     Promise.all([updateJobPromise, applicationPromise])
       .then(response => {
-        return res.json({ message: "Create successfully", data: response[1] });
+        return res
+          .status(201)
+          .json({ message: "Create successfully", data: response[1] });
       })
       .catch(err => {
         return res.status(400).json(err);
@@ -80,8 +82,6 @@ module.exports.putApplication = async (req, res) => {
   const applicationId = req.params.applicationId;
   const { applicantInfo, jobId, status, skillIds, isPriority, attachments } =
     req.body;
-
-  const newInfo = { jobId, status, skillIds, isPriority, attachments };
 
   try {
     const prevApplication = await Application.findById(applicationId);
@@ -104,6 +104,7 @@ module.exports.putApplication = async (req, res) => {
       }
     }
 
+    const newInfo = { jobId, status, skillIds, isPriority, attachments };
     const prevApplicantInfo = prevApplication.applicantInfo;
 
     if (applicantInfo) {
