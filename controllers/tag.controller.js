@@ -47,6 +47,7 @@ module.exports.putTags = async (req, res) => {
 };
 
 module.exports.deleteTag = async (req, res) => {
+  // TODO: delete all tag in job, candidate,...
   const tagId = req.params.tagId;
 
   try {

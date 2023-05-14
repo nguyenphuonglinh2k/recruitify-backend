@@ -5,6 +5,8 @@ const projectController = require("../controllers/project.controller");
 
 router.get("/projects/:userId", projectController.getProjects);
 
+router.get("/project-statistics", projectController.getProjectStatistics);
+
 router.get("/project/:projectId", projectController.getProjectInfo);
 
 router.get(

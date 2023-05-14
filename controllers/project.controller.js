@@ -1,6 +1,7 @@
 const Project = require("../models/project.model");
 const Task = require("../models/task.model");
 const User = require("../models/user.model");
+const constant = require("../utils/constant");
 
 const Constant = require("../utils/constant");
 
@@ -27,6 +28,38 @@ module.exports.getProjects = async (req, res) => {
 
         .catch(error => res.status(400).json({ error }));
     }
+  } catch (error) {
+    return res.status(400).json(error);
+  }
+};
+
+module.exports.getProjectStatistics = async (_, res) => {
+  try {
+    const projectNewPromise = Project.find({
+      status: constant.PROGRESS_STATUS.new,
+    });
+    const projectDoingPromise = Project.find({
+      status: constant.PROGRESS_STATUS.doing,
+    });
+    const projectDonePromise = Project.find({
+      status: constant.PROGRESS_STATUS.done,
+    });
+
+    await Promise.all([
+      projectNewPromise,
+      projectDoingPromise,
+      projectDonePromise,
+    ])
+      .then(responses =>
+        res.json({
+          new: responses[0].length,
+          doing: responses[1].length,
+          done: responses[2].length,
+        }),
+      )
+      .catch(err => {
+        return res.status(400).json(err);
+      });
   } catch (error) {
     return res.status(400).json(error);
   }
