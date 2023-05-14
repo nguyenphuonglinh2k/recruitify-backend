@@ -35,7 +35,9 @@ module.exports.getProjectTasks = async (req, res) => {
   }
 };
 
-module.exports.getWeeklyTaskStatistics = async (_, res) => {
+module.exports.getWeeklyTaskStatistics = async (req, res) => {
+  const userId = req.params.memberId;
+
   const monday = new Date(
     moment()
       .startOf("isoWeek")
@@ -73,22 +75,27 @@ module.exports.getWeeklyTaskStatistics = async (_, res) => {
 
   try {
     const mondayTasksPromise = Task.find({
+      assigneeId: userId,
       startDate: { $lte: monday },
       endDate: { $gte: monday },
     });
     const tuesdayTasksPromise = Task.find({
+      assigneeId: userId,
       startDate: { $lte: tuesday },
       endDate: { $gte: tuesday },
     });
     const wednesdayTasksPromise = Task.find({
+      assigneeId: userId,
       startDate: { $lte: wednesday },
       endDate: { $gte: wednesday },
     });
     const thursdayTasksPromise = Task.find({
+      assigneeId: userId,
       startDate: { $lte: thursday },
       endDate: { $gte: thursday },
     });
     const fridayTasksPromise = Task.find({
+      assigneeId: userId,
       startDate: { $lte: friday },
       endDate: { $gte: friday },
     });

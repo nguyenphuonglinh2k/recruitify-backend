@@ -5,7 +5,10 @@ const taskController = require("../controllers/task.controller");
 
 router.get("/project/:projectId/tasks", taskController.getProjectTasks);
 
-router.get("/task-statistics-weekly", taskController.getWeeklyTaskStatistics);
+router.get(
+  "/task-statistics-weekly/:memberId",
+  taskController.getWeeklyTaskStatistics,
+);
 
 router.get(
   "/member/:memberId/today-tasks",
