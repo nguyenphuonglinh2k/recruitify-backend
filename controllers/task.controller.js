@@ -1,3 +1,4 @@
+const moment = require("moment");
 const Project = require("../models/project.model");
 const Task = require("../models/task.model");
 const constant = require("../utils/constant");
@@ -20,6 +21,116 @@ module.exports.getProjectTasks = async (req, res) => {
       .populate([
         { path: "assigneeId", select: "-password" },
         { path: "projectId" },
+      ])
+      .then((results, error) => {
+        if (results) {
+          return res.json(results);
+        } else {
+          return res.status(400).json(error);
+        }
+      })
+      .catch(error => res.status(400).json(error));
+  } catch (error) {
+    return res.status(400).json(error);
+  }
+};
+
+module.exports.getWeeklyTaskStatistics = async (_, res) => {
+  const monday = new Date(
+    moment()
+      .startOf("isoWeek")
+      .add(0, "days")
+      .format(constant.FORMAT_DATE_WITH_HYPHEN),
+  );
+
+  const tuesday = new Date(
+    moment()
+      .startOf("isoWeek")
+      .add(1, "days")
+      .format(constant.FORMAT_DATE_WITH_HYPHEN),
+  );
+
+  const wednesday = new Date(
+    moment()
+      .startOf("isoWeek")
+      .add(2, "days")
+      .format(constant.FORMAT_DATE_WITH_HYPHEN),
+  );
+
+  const thursday = new Date(
+    moment()
+      .startOf("isoWeek")
+      .add(3, "days")
+      .format(constant.FORMAT_DATE_WITH_HYPHEN),
+  );
+
+  const friday = new Date(
+    moment()
+      .startOf("isoWeek")
+      .add(4, "days")
+      .format(constant.FORMAT_DATE_WITH_HYPHEN),
+  );
+
+  try {
+    const mondayTasksPromise = Task.find({
+      startDate: { $lte: monday },
+      endDate: { $gte: monday },
+    });
+    const tuesdayTasksPromise = Task.find({
+      startDate: { $lte: tuesday },
+      endDate: { $gte: tuesday },
+    });
+    const wednesdayTasksPromise = Task.find({
+      startDate: { $lte: wednesday },
+      endDate: { $gte: wednesday },
+    });
+    const thursdayTasksPromise = Task.find({
+      startDate: { $lte: thursday },
+      endDate: { $gte: thursday },
+    });
+    const fridayTasksPromise = Task.find({
+      startDate: { $lte: friday },
+      endDate: { $gte: friday },
+    });
+
+    await Promise.all([
+      mondayTasksPromise,
+      tuesdayTasksPromise,
+      wednesdayTasksPromise,
+      thursdayTasksPromise,
+      fridayTasksPromise,
+    ])
+      .then(responses =>
+        res.json({
+          monday: responses[0].length,
+          tuesday: responses[1].length,
+          wednesday: responses[2].length,
+          thursday: responses[3].length,
+          friday: responses[4].length,
+        }),
+      )
+      .catch(error => res.status(400).json(error));
+  } catch (error) {
+    return res.status(400).json(error);
+  }
+};
+
+module.exports.getTodayTaskOfMember = async (req, res) => {
+  const memberId = req.params.memberId;
+  const status = req.query?.status ?? constant.PROGRESS_STATUS.new;
+
+  const today = moment().format("YYYY-MM-DD");
+
+  try {
+    await Task.find({
+      assigneeId: memberId,
+      status,
+      startDate: { $lte: new Date(today) },
+      endDate: { $gte: new Date(today) },
+    })
+      .populate([
+        { path: "projectId" },
+        { path: "assigneeId", select: "-password" },
       ])
       .then((results, error) => {
         if (results) {
@@ -131,8 +242,8 @@ module.exports.postTask = async (req, res) => {
     const newTask = new Task({
       name,
       description: description ?? "",
-      startDate: startDate ?? null,
-      endDate: endDate ?? null,
+      startDate: new Date(startDate) ?? null,
+      endDate: new Date(endDate) ?? null,
       status,
       progress: progress ?? 0,
       assigneeId,

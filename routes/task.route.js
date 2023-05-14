@@ -5,6 +5,13 @@ const taskController = require("../controllers/task.controller");
 
 router.get("/project/:projectId/tasks", taskController.getProjectTasks);
 
+router.get("/task-statistics-weekly", taskController.getWeeklyTaskStatistics);
+
+router.get(
+  "/member/:memberId/today-tasks",
+  taskController.getTodayTaskOfMember,
+);
+
 router.get("/member/:memberId/tasks", taskController.getTasksOfMember);
 
 router.get("/task/:taskId/:memberId", taskController.getTaskDetailOfMember);

@@ -20,11 +20,11 @@ const schema = new mongoose.Schema(
       required: true,
     },
     startDate: {
-      type: String,
+      type: Date,
       required: false,
     },
     endDate: {
-      type: String,
+      type: Date,
       required: false,
     },
     projectId: {

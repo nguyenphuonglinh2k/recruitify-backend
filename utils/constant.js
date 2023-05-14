@@ -28,4 +28,6 @@ module.exports = {
     "https://res.cloudinary.com/coders-tokyo/image/upload/v1657474500/instello/avatar.png",
 
   BCRYPT_SALT_ROUNDS: 12,
+
+  FORMAT_DATE_WITH_HYPHEN: "YYYY-MM-DD",
 };
