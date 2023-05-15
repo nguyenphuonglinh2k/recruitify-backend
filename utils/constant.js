@@ -27,6 +27,7 @@ module.exports = {
   RESULT_STATUS: {
     qualified: 1,
     unqualified: 2,
+    notEvaluated: 3,
   },
 
   DEFAULT_AVATAR_URL:

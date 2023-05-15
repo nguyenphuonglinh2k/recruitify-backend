@@ -58,13 +58,13 @@ module.exports.postTrainResult = async (req, res) => {
 };
 
 module.exports.putTrainResult = async (req, res) => {
-  const { status, evaluation, candidateId, description } = req.body;
+  const { status, evaluation, description } = req.body;
   const resultId = req.params.resultId;
 
   try {
     await TrainResult.findByIdAndUpdate(
       { _id: resultId },
-      { status, evaluation, candidateId, description },
+      { status, evaluation, description },
       { new: true },
     ).then((result, error) => {
       if (error) {
