@@ -6,7 +6,7 @@ const trainResultController = require("../controllers/trainResult.controller");
 router.get("/train-results", trainResultController.getTrainResults);
 
 router.get(
-  "/train-results/:resultId",
+  "/train-result/:resultId",
   trainResultController.getTrainResultDetail,
 );
 
