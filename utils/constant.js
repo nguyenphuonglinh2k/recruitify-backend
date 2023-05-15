@@ -24,6 +24,11 @@ module.exports = {
     hire: 4,
   },
 
+  RESULT_STATUS: {
+    qualified: 1,
+    unqualified: 2,
+  },
+
   DEFAULT_AVATAR_URL:
     "https://res.cloudinary.com/coders-tokyo/image/upload/v1657474500/instello/avatar.png",
 

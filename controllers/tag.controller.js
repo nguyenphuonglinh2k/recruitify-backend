@@ -35,7 +35,7 @@ module.exports.putTags = async (req, res) => {
     await Tag.findByIdAndUpdate({ _id: tagId }, { name }, { new: true }).then(
       (result, error) => {
         if (error) {
-          res.status(400).json({ message: "Update tags failed", error });
+          return res.status(400).json({ message: "Update tags failed", error });
         }
 
         res.json({ message: "Update tags successfully", data: result });
@@ -53,7 +53,7 @@ module.exports.deleteTag = async (req, res) => {
   try {
     await Tag.findByIdAndDelete(tagId).then((_, error) => {
       if (error) {
-        res.status(400).json({ message: "Delete failed", error });
+        return res.status(400).json({ message: "Delete failed", error });
       }
 
       res.json({ message: "Delete successfully" });

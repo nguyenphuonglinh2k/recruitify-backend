@@ -18,16 +18,7 @@ const schema = new mongoose.Schema(
     description: {
       type: String,
       required: false,
-    },
-    projectIds: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: false,
-      ref: "Project",
-    },
-    taskIds: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: false,
-      ref: "Task",
+      default: "",
     },
   },
   {
