@@ -54,7 +54,7 @@ module.exports.getTrainResultDetail = async (req, res) => {
 module.exports.postTrainResult = async (req, res) => {
   const { status, evaluation, candidateId, description } = req.body;
 
-  if (!status || !evaluation || !candidateId) {
+  if (!status || ![0, 1, 2, 3, 4, 5].includes(evaluation) || !candidateId) {
     return res.status(400).json({ message: "Missing required fields" });
   }
 
