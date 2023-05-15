@@ -1,4 +1,22 @@
 const TrainResult = require("../models/trainResult.model");
+const User = require("../models/user.model");
+const constant = require("../utils/constant");
+
+module.exports.getNotEvaluatedUsers = async (_, res) => {
+  try {
+    const results = await TrainResult.find().lean();
+    const evaluatedUserIds = results?.map(result => result.candidateId);
+
+    const users = await User.find({
+      _id: { $nin: evaluatedUserIds },
+      role: constant.USER_ROLE.candidate,
+    }).select("-password");
+
+    res.json(users);
+  } catch (error) {
+    res.status(400).json(error);
+  }
+};
 
 module.exports.getTrainResults = async (req, res) => {
   const status = req.query?.status;

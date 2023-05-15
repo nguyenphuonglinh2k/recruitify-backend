@@ -3,6 +3,11 @@ const router = express.Router();
 
 const trainResultController = require("../controllers/trainResult.controller");
 
+router.get(
+  "/train-results/not-evaluated-users",
+  trainResultController.getNotEvaluatedUsers,
+);
+
 router.get("/train-results", trainResultController.getTrainResults);
 
 router.get(
