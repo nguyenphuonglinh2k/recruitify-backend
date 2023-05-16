@@ -3,6 +3,13 @@ const router = express.Router();
 
 const applicationController = require("../controllers/application.controller");
 
+router.get(
+  "/application-statistics",
+  applicationController.getApplicationStatistics,
+);
+
+router.get("/activity-statistics", applicationController.getActivityStatistics);
+
 router.get("/applications", applicationController.getApplications);
 
 router.get(

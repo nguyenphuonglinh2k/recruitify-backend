@@ -2,6 +2,151 @@ const Application = require("../models/application.model");
 const Job = require("../models/job.model");
 const Constant = require("../utils/constant");
 
+const moment = require("moment");
+
+module.exports.getApplicationStatistics = async (_, res) => {
+  try {
+    const applications = await Application.find().lean();
+
+    const screenApplications = applications.filter(
+      item => item.status === Constant.APPLICATION_PROCESS_STATUS.screening,
+    );
+    const interviewApplications = applications.filter(
+      item => item.status === Constant.APPLICATION_PROCESS_STATUS.interview,
+    );
+    const hireApplications = applications.filter(
+      item => item.status === Constant.APPLICATION_PROCESS_STATUS.hire,
+    );
+    const rejectApplications = applications.filter(
+      item => item.status === Constant.APPLICATION_PROCESS_STATUS.reject,
+    );
+
+    res.json({
+      screening: screenApplications.length,
+      interview: interviewApplications.length,
+      hire: hireApplications.length,
+      reject: rejectApplications.length,
+    });
+  } catch (error) {
+    res.status(400).json(error);
+  }
+};
+
+module.exports.getActivityStatistics = async (_, res) => {
+  const startOfToday = new Date(
+    moment().startOf("day").format(Constant.FORMAT_DATE_WITH_HYPHEN),
+  );
+  const endOfToday = new Date(
+    moment().endOf("day").format(Constant.FORMAT_DATE_WITH_HYPHEN),
+  );
+
+  // Yesterday
+  const startOfYesterday = new Date(
+    moment()
+      .subtract(1, "days")
+      .startOf("day")
+      .format(Constant.FORMAT_DATE_WITH_HYPHEN),
+  );
+  const endOfYesterday = new Date(
+    moment()
+      .subtract(1, "days")
+      .endOf("day")
+      .format(Constant.FORMAT_DATE_WITH_HYPHEN),
+  );
+
+  // This week
+  const currentStartOfMonday = new Date(
+    moment()
+      .startOf("isoWeek")
+      .add(0, "days")
+      .format(Constant.FORMAT_DATE_WITH_HYPHEN),
+  );
+  const currentStartOfSaturday = new Date(
+    moment()
+      .startOf("isoWeek")
+      .add(5, "days")
+      .format(Constant.FORMAT_DATE_WITH_HYPHEN),
+  );
+
+  // Last week
+  const lastStartOfMonday = new Date(
+    moment()
+      .subtract(1, "weeks")
+      .startOf("isoWeek")
+      .format(Constant.FORMAT_DATE_WITH_HYPHEN),
+  );
+  const lastStartOfSaturday = new Date(
+    moment()
+      .subtract(1, "weeks")
+      .startOf("isoWeek")
+      .add(5, "days")
+      .format(Constant.FORMAT_DATE_WITH_HYPHEN),
+  );
+
+  // This month
+  const startOfThisMonth = new Date(
+    moment().startOf("month").format(Constant.FORMAT_DATE_WITH_HYPHEN),
+  );
+  const endOfThisMonth = new Date(
+    moment().endOf("month").format(Constant.FORMAT_DATE_WITH_HYPHEN),
+  );
+
+  // Last month
+  const startOfLastMonth = new Date(
+    moment()
+      .subtract(1, "months")
+      .startOf("month")
+      .format(Constant.FORMAT_DATE_WITH_HYPHEN),
+  );
+  const endOfLastMonth = new Date(
+    moment()
+      .subtract(1, "months")
+      .endOf("month")
+      .format(Constant.FORMAT_DATE_WITH_HYPHEN),
+  );
+
+  try {
+    const todayApplicationsPromise = Application.find({
+      createdAt: { $gte: startOfToday, $lte: endOfToday },
+    });
+    const yesterdayApplicationsPromise = Application.find({
+      createdAt: { $gte: startOfYesterday, $lte: endOfYesterday },
+    });
+    const thisMonthApplicationsPromise = Application.find({
+      createdAt: { $gte: startOfThisMonth, $lte: endOfThisMonth },
+    });
+    const lastMonthApplicationsPromise = Application.find({
+      createdAt: { $gte: startOfLastMonth, $lte: endOfLastMonth },
+    });
+    const thisWeekApplicationsPromise = Application.find({
+      createdAt: { $gte: currentStartOfMonday, $lte: currentStartOfSaturday },
+    });
+    const lastWeekApplicationsPromise = Application.find({
+      createdAt: { $gte: lastStartOfMonday, $lte: lastStartOfSaturday },
+    });
+
+    await Promise.all([
+      todayApplicationsPromise,
+      yesterdayApplicationsPromise,
+      thisMonthApplicationsPromise,
+      thisWeekApplicationsPromise,
+      lastMonthApplicationsPromise,
+      lastWeekApplicationsPromise,
+    ]).then(responses =>
+      res.json({
+        today: responses[0].length,
+        yesterday: responses[1].length,
+        thisMonth: responses[2].length,
+        thisWeek: responses[3].length,
+        lastMonth: responses[4].length,
+        lastWeek: responses[5].length,
+      }),
+    );
+  } catch (error) {
+    res.status(400).json(error);
+  }
+};
+
 module.exports.getApplications = async (req, res) => {
   const status =
     req.query?.status ?? Constant.APPLICATION_PROCESS_STATUS.screening;
