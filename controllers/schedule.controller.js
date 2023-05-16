@@ -27,17 +27,33 @@ module.exports.getSchedules = async (req, res) => {
   }
 };
 
-module.exports.getScheduleDetail = async (req, res) => {
-  const scheduleId = req.params.scheduleId;
+module.exports.getScheduleOfApplicant = async (req, res) => {
+  const applicationId = req.params.applicationId;
 
   try {
-    const schedules = await Schedule.findById(scheduleId).populate([
+    const schedule = await Schedule.findOne({ applicationId }).populate([
       { path: "assigneeIds", select: "-password" },
       { path: "creatorId", select: "-password" },
       { path: "applicationId" },
       { path: "jobId" },
     ]);
-    res.json(schedules);
+    res.json(schedule);
+  } catch (error) {
+    res.status(400).json(error);
+  }
+};
+
+module.exports.getScheduleDetail = async (req, res) => {
+  const scheduleId = req.params.scheduleId;
+
+  try {
+    const schedule = await Schedule.findById(scheduleId).populate([
+      { path: "assigneeIds", select: "-password" },
+      { path: "creatorId", select: "-password" },
+      { path: "applicationId" },
+      { path: "jobId" },
+    ]);
+    res.json(schedule);
   } catch (error) {
     res.status(400).json(error);
   }

@@ -7,6 +7,11 @@ router.get("/schedules", scheduleController.getSchedules);
 
 router.get("/schedule/:scheduleId", scheduleController.getScheduleDetail);
 
+router.get(
+  "/applicant-schedule/:applicationId",
+  scheduleController.getScheduleOfApplicant,
+);
+
 router.post("/schedule", scheduleController.postSchedules);
 
 router.put("/schedule/:scheduleId", scheduleController.putSchedule);
