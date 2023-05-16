@@ -16,6 +16,7 @@ const jobRoute = require("./routes/job.route");
 const applicationRoute = require("./routes/application.route");
 const scheduleRoute = require("./routes/schedule.route");
 const trainResultRoute = require("./routes/trainResult.route");
+const interviewResultRoute = require("./routes/interviewResult.route");
 
 const app = express();
 const port = 5000;
@@ -46,6 +47,7 @@ app.use("/api", jobRoute);
 app.use("/api", applicationRoute);
 app.use("/api", scheduleRoute);
 app.use("/api", trainResultRoute);
+app.use("/api", interviewResultRoute);
 
 app.get("/", (_, res) => {
   res.send("Hello World!");

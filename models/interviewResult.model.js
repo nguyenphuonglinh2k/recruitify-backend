@@ -15,14 +15,10 @@ const schema = new mongoose.Schema(
       required: true,
       ref: "Application",
     },
-    positionId: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true,
-      ref: "Job",
-    },
     description: {
       type: String,
       required: false,
+      default: "",
     },
   },
   {
