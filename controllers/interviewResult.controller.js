@@ -33,6 +33,20 @@ module.exports.getInterviewResultDetail = async (req, res) => {
   }
 };
 
+module.exports.getInterviewResultDetailOfApplicationId = async (req, res) => {
+  const applicationId = req.params.applicationId;
+
+  try {
+    const result = await InterviewResult.findOne({ applicationId }).populate([
+      { path: "applicationId" },
+    ]);
+
+    res.json(result);
+  } catch (error) {
+    res.status(400).json(error);
+  }
+};
+
 module.exports.postInterviewResult = async (req, res) => {
   const { status, evaluation, applicationId, description } = req.body;
 

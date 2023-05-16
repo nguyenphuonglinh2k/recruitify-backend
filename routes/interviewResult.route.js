@@ -10,6 +10,11 @@ router.get(
   interviewResultController.getInterviewResultDetail,
 );
 
+router.get(
+  "/interview-result/application/:applicationId",
+  interviewResultController.getInterviewResultDetailOfApplicationId,
+);
+
 router.put(
   "/interview-result/:resultId",
   interviewResultController.putInterviewResult,
