@@ -32,7 +32,8 @@ module.exports.postSignIn = async (req, res) => {
 };
 
 module.exports.postSignUp = (req, res) => {
-  const { name, email, password, role, phoneNumber, address } = req.body;
+  const { name, email, password, role, phoneNumber, address, applicationIds } =
+    req.body;
 
   const avatarUrl = Constant.DEFAULT_AVATAR_URL;
 
@@ -64,7 +65,7 @@ module.exports.postSignUp = (req, res) => {
           phoneNumber: phoneNumber ?? null,
           address: address ?? null,
           password: hash,
-          applicationIds: [],
+          applicationIds: applicationIds ?? [],
         });
 
         await User.create(newUser).then((_, err) => {

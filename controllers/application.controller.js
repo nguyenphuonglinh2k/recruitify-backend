@@ -148,11 +148,15 @@ module.exports.getActivityStatistics = async (_, res) => {
 };
 
 module.exports.getApplications = async (req, res) => {
-  const status =
-    req.query?.status ?? Constant.APPLICATION_PROCESS_STATUS.screening;
+  const status = req.query?.status;
+  const options = {};
+
+  if (status) {
+    options.status = status;
+  }
 
   try {
-    const applications = await Application.find({ status }).populate([
+    const applications = await Application.find(options).populate([
       { path: "skillIds" },
       { path: "jobId" },
     ]);
