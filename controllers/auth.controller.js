@@ -11,7 +11,7 @@ module.exports.postSignIn = async (req, res) => {
     return res.status(400).json({ message: "Please add all the fields" });
   }
 
-  let user = await User.findOne({ email }).lean();
+  let user = await User.findOne({ email }).populate(["applicationIds"]).lean();
 
   if (!user) {
     return res.status(400).json({ message: "Email is not exist" });
