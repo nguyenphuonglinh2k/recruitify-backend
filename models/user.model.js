@@ -35,6 +35,7 @@ const schema = new mongoose.Schema(
       {
         type: Schema.Types.ObjectId,
         required: false,
+        ref: "Application",
       },
     ],
   },

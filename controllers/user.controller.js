@@ -24,7 +24,7 @@ module.exports.getUserInfo = async (req, res) => {
   try {
     const user = await User.findById({ _id: userId })
       .select("-password")
-      .lean();
+      .populate(["applicationIds"]);
 
     res.json(user);
   } catch (error) {
