@@ -4,11 +4,15 @@ const Application = require("../models/application.model");
 const Constant = require("../utils/constant");
 
 module.exports.getJobs = async (req, res) => {
-  const status =
-    req.query?.status ?? Constant.JOB_AND_APPLICATION_STATUS.active;
+  const status = req.query?.status;
+  const options = {};
+
+  if (status) {
+    options.status = status;
+  }
 
   try {
-    const jobs = await Job.find({ status }).populate([
+    const jobs = await Job.find(options).populate([
       { path: "creatorId", select: "-password" },
       { path: "assigneeIds", select: "-password" },
       { path: "tagIds" },

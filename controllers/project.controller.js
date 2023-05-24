@@ -166,24 +166,35 @@ module.exports.putMembers = async (req, res) => {
   try {
     const project = await Project.findById(projectId).lean();
 
+    if (!project._id) {
+      return res.status(400).json({ message: "Project not found!" });
+    }
+
     // 1. Get members need to remove
-    const removedMembers = (project?.memberIds ?? []).filter(
-      id => !memberIds.includes(id),
-    );
+    // const removedMembers = project.memberIds.reduce((arr, current) => {
+    //   if (!memberIds.includes(current.valueOf())) {
+    //     arr.push(current.valueOf());
+    //   }
+    //   return arr;
+    // }, []);
 
     // 2. Reset projectId field of tasks
-    const taskPromise = await Task.updateMany(
-      { projectId, assigneeId: { $in: removedMembers } },
-      { $set: { projectId: null } },
-    );
+    // const updatedTasks = await Task.updateMany(
+    //   { projectId, assigneeId: { $in: removedMembers } },
+    //   { $set: { projectId: null } },
+    //   { new: true },
+    // );
 
-    // 3. Update memberIds in project
-    const projectPromise = await Project.findByIdAndUpdate(
+    // 3. Update memberIds and totalTask in project
+    const projectPromise = Project.findByIdAndUpdate(
       { _id: projectId },
-      { memberIds },
+      {
+        memberIds,
+        // $inc: { taskTotal: 0 - updatedTasks.length },
+      },
     );
 
-    Promise.all([taskPromise, projectPromise])
+    Promise.all([projectPromise])
       .then(() => {
         return res.json({ message: "Update successfully" });
       })
