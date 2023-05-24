@@ -8,16 +8,21 @@ const Constant = require("../utils/constant");
 // Only return projects that memberId belongs to
 module.exports.getProjects = async (req, res) => {
   const userId = req.params.userId;
-  const status = req.query?.status || Constant.PROGRESS_STATUS.new;
+  const status = req.query?.status;
+  const options = {};
+
+  if (status) {
+    options.status = status;
+  }
 
   try {
     const user = await User.findById(userId).lean();
 
     if (user.role === Constant.USER_ROLE.admin) {
-      const projects = await Project.find({ status });
+      const projects = await Project.find(options);
       res.json(projects);
     } else {
-      await Project.find({ status })
+      await Project.find(options)
         .then(projects => {
           const filteredProjects = projects.filter(project => {
             return project?.memberIds?.some(id => id.valueOf() === userId);
