@@ -214,10 +214,10 @@ module.exports.postApplication = async (req, res) => {
     const applicationPromise = Application.create(newApplication);
 
     Promise.all([updateJobPromise, applicationPromise])
-      .then(response => {
+      .then(responses => {
         return res
           .status(201)
-          .json({ message: "Create successfully", data: response[1] });
+          .json({ message: "Create successfully", data: responses[1] });
       })
       .catch(err => {
         return res.status(400).json(err);

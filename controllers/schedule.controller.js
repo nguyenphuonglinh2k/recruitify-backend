@@ -158,16 +158,18 @@ module.exports.putSchedule = async (req, res) => {
 };
 
 module.exports.deleteSchedule = async (req, res) => {
-  const { scheduleId } = req.params;
+  const scheduleId = req.params.scheduleId;
 
   try {
-    await Tag.findByIdAndDelete({ _id: scheduleId }).then((result, error) => {
-      if (error) {
-        res.status(400).json({ message: "Delete failed", error });
-      }
+    await Schedule.findByIdAndDelete({ _id: scheduleId }).then(
+      (result, error) => {
+        if (error) {
+          res.status(400).json({ message: "Delete failed", error });
+        }
 
-      res.json({ message: "Delete successfully" });
-    });
+        res.json({ message: "Delete successfully" });
+      },
+    );
   } catch (error) {
     res.status(400).json(error);
   }
