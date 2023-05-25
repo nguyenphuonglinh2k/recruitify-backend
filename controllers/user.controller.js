@@ -11,7 +11,9 @@ module.exports.getUsers = async (req, res) => {
   }
 
   try {
-    const users = await User.find(options).select("-password");
+    const users = await User.find(options)
+      .select("-password")
+      .sort({ role: 1 });
     res.json(users);
   } catch (error) {
     return res.status(400).json(error);

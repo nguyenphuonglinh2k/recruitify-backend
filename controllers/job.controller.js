@@ -42,7 +42,7 @@ module.exports.getApplicationsOfJob = async (req, res) => {
   const jobId = req.params.jobId;
 
   try {
-    const applications = await Application.find({ jobId });
+    const applications = await Application.find({ jobId }).sort({ status: 1 });
 
     res.json(applications);
   } catch (error) {
