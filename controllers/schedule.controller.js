@@ -1,4 +1,3 @@
-const Tag = require("../models/tag.model");
 const Schedule = require("../models/schedule.model");
 
 // 1. Get by member

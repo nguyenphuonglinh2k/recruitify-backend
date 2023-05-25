@@ -141,21 +141,19 @@ module.exports.putJob = async (req, res) => {
   }
 };
 
+// Delete job -> delete all application inside
 module.exports.deleteJob = async (req, res) => {
   const jobId = req.params.jobId;
 
   try {
-    await Job.findOneAndDelete({ _id: jobId }).then(result => {
-      if (!result) {
-        res.status(400).json({
-          message: "Delete job failed",
-        });
-      } else {
-        res.json({
-          message: "Delete job successfully",
-        });
-      }
-    });
+    const deleteJobPromise = Job.findOneAndDelete({ _id: jobId });
+    const deleteApplications = Application.deleteMany({ jobId });
+
+    await Promise.all([deleteJobPromise, deleteApplications])
+      .then(() => res.json({ message: "Delete successfully" }))
+      .catch(err => {
+        return res.status(400).json(err);
+      });
   } catch (error) {
     return res.status(400).json(error);
   }
