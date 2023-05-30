@@ -1,5 +1,8 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const otpGenerator = require("otp-generator");
+const nodemailer = require("nodemailer");
+const smtpTransport = require("nodemailer-smtp-transport");
 
 const User = require("../models/user.model");
 const Constant = require("../utils/constant");
@@ -126,5 +129,86 @@ module.exports.putUpdatePassword = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
+  }
+};
+
+const generateOTP = () => {
+  const OTP = otpGenerator.generate(6, {
+    specialChars: false,
+  });
+
+  return OTP;
+};
+
+const sendOTPEmail = (email, otp) => {
+  const transporter = nodemailer.createTransport(
+    smtpTransport({
+      service: "gmail",
+      host: "smtp.gmail.com",
+      auth: {
+        user: process.env.MAIL_EMAIL,
+        pass: process.env.MAIL_PASSWORD,
+      },
+    }),
+  );
+
+  var mailOptions = {
+    from: process.env.MAIL_EMAIL,
+    to: email,
+    subject: "Recruitify Reset Password Code",
+    text: `Your new password to login is: ${otp}`,
+  };
+
+  transporter.sendMail(mailOptions, function (error, info) {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log("Email sent: " + info.response);
+    }
+  });
+};
+
+module.exports.forgotPassword = async (req, res) => {
+  const { email } = req.body;
+
+  // Check email format
+  const emailExtension = email.slice(-10);
+
+  if (emailExtension !== "@gmail.com")
+    return res.status(400).json({ message: "Email is invalid" });
+
+  try {
+    // Check exist
+    const user = await User.findOne({ email });
+
+    if (!user._id) {
+      return res.status(400).json({ message: "Email doesn't exist" });
+    }
+
+    const newPassword = generateOTP();
+    sendOTPEmail(process.env.MAIL_EMAIL, newPassword);
+
+    console.log("newPassword", newPassword);
+
+    // Update password
+    bcrypt.hash(newPassword, Constant.BCRYPT_SALT_ROUNDS, function (err, hash) {
+      if (err) {
+        console.log("err", err);
+        throw new Error(err);
+      }
+
+      User.findByIdAndUpdate({ _id: user._id }, { password: hash })
+        .then(result => {
+          if (!result) {
+            return res
+              .status(400)
+              .json({ message: "Reset password is failed" });
+          }
+          res.json({ message: "Reset password successfully" });
+        })
+        .catch(err => console.log(err));
+    });
+  } catch (error) {
+    res.status(400).json(error);
   }
 };

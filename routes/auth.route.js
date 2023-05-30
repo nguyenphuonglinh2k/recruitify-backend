@@ -9,4 +9,6 @@ router.post("/signup", authController.postSignUp);
 
 router.put("/update-password/:userId", authController.putUpdatePassword);
 
+router.post("/forgot-password", authController.forgotPassword);
+
 module.exports = router;
