@@ -181,7 +181,7 @@ module.exports.forgotPassword = async (req, res) => {
     // Check exist
     const user = await User.findOne({ email });
 
-    if (!user._id) {
+    if (!user) {
       return res.status(400).json({ message: "Email doesn't exist" });
     }
 
