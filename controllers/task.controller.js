@@ -134,6 +134,7 @@ module.exports.getTodayTaskOfMember = async (req, res) => {
       startDate: { $lte: new Date(endOfToday) },
       endDate: { $gte: new Date(startOfToday) },
     })
+      .sort({ status: 1 })
       .populate([
         { path: "projectId" },
         { path: "assigneeId", select: "-password" },
