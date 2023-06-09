@@ -124,16 +124,15 @@ module.exports.getWeeklyTaskStatistics = async (req, res) => {
 
 module.exports.getTodayTaskOfMember = async (req, res) => {
   const memberId = req.params.memberId;
-  const status = req.query?.status ?? constant.PROGRESS_STATUS.new;
 
-  const today = moment().format("YYYY-MM-DD");
+  const startOfToday = moment().startOf("day");
+  const endOfToday = moment().endOf("day");
 
   try {
     await Task.find({
       assigneeId: memberId,
-      status,
-      startDate: { $lte: new Date(today) },
-      endDate: { $gte: new Date(today) },
+      startDate: { $lte: new Date(endOfToday) },
+      endDate: { $gte: new Date(startOfToday) },
     })
       .populate([
         { path: "projectId" },
